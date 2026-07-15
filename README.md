@@ -32,10 +32,23 @@ We aim to provide a dynamic resource where users can find the latest optimizatio
 
 - Software
   - [Cassandra](software/cassandra/README.md)
+      - [Cassandra QAT](software/cassandra/QAT/README.md)
   - [Gluten](software/gluten/README.md)
   - [Java](software/java/README.md)
+  - [Similarity Search](software/similarity-search/README.md)
+    - [Redis](software/similarity-search/redis/README.md)
   - [Spark](software/spark/README.md)
+  - [scikit-learn](software/scikit-learn/README.md)
   - [MySQL & PostgreSQL](software/mysql-postgresql/README.md)
+  - [Envoy](software/envoy/README.md)
+  - [Kafka](software/kafka/README.md)
+  - [R (Rlang / Rstats)](software/R/README.md)
+  - [TensorFlow](software/tensorflow/)
+    - [ResNet50 – Computer Vision](software/tensorflow/computer-vision-resnet50/README.md)
+    - [BERT – NLP](software/tensorflow/nlp-transformers-bert/README.md)
+    - [RGAT – Graph Neural Networks](software/tensorflow/graph-neural-networks-rgat/README.md)
+  - [vLLM](software/vllm/README.md)
+  - [zlib-accel](software/zlib-accel/README.md)
 - Workloads
   - [Cassandra Stress](workloads/cassandra-stress/README.md)
   - [HPC](workloads/hpc/README.md)
@@ -48,6 +61,8 @@ We aim to provide a dynamic resource where users can find the latest optimizatio
   - [VTune Profiler](tools/vtune/README.md)
 - Hardware
   - [PMU](hardware/PMU/README.md)
+  - [Priority Core Turbo](hardware/priority_core_turbo/README.md)
+  - [Scaling](hardware/scaling/README.md)
 
 ## Contributing
 
