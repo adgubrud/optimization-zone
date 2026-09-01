@@ -41,6 +41,8 @@ We aim to provide a dynamic resource where users can find the latest optimizatio
   - [Kubernetes](software/kubernetes/README.md)
     - [NRI Resource-Policy Plugins](software/kubernetes/nri-resource-policies/README.md)
   - [MySQL & PostgreSQL](software/mysql-postgresql/README.md)
+  - [NGINX](software/nginx/README.md)
+      - [NGINX QAT](software/nginx/QAT/README.md)
   - [NumPy](software/numpy/README.md)
   - [R (Rlang / Rstats)](software/R/README.md)
   - [scikit-learn](software/scikit-learn/README.md)
