@@ -40,23 +40,43 @@ It is highly recommended to use Intel's [oneMKL](https://www.intel.com/content/w
 
 ##### Linux
 
-On Linux, by default, R will link to a generic `libblas` and `liblapack`. On Debian-based systems, the vendor version behind those can be controlled through the [Debian alternatives system](https://wiki.debian.org/DebianAlternatives). To set oneMKL as the system provider for `libblas` and `liblapack`, after installing it through [Intel's APT packages](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html?operatingsystem=linux&linux-install=apt), execute the following commands and choose oneMKL (`libmkl_rt.so`) as provider:
+On Linux, by default, R will link to a generic `libblas` and `liblapack`. On **Debian**-based systems (including derivatives such as Ubuntu and Mint), the vendor version behind those can be controlled through the [Debian alternatives system](https://wiki.debian.org/DebianAlternatives). OneMKL can be set as the system provider for `libblas` and `liblapack` after installing it through [Intel's APT packages](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl-download.html?operatingsystem=linux&linux-install=apt):
 
+* To install MKL:
 ```shell
-sudo update-alternatives --config libblas.so-x86_64-linux-gnu
-sudo update-alternatives --config liblapack.so-x86_64-linux-gnu
+sudo apt install -y gpg-agent wget # prerequisites
+wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | sudo tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | sudo tee /etc/apt/sources.list.d/oneAPI.list
+sudo apt update
+sudo apt install intel-oneapi-mkl
 ```
 
-If oneMKL is installed through means other than APT, one might first need to [source its environment script](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2026-0/setting-environment-variables.html#SETTING-ENVIRONMENT-VARIABLES) **before** executing the commands above:
-
+* To add oneMKL's paths to system library loading paths, assuming version 2026.0 (not needed if one [sources the environment script](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2026-0/setting-environment-variables.html#SETTING-ENVIRONMENT-VARIABLES) before launching R):
 ```shell
-source /opt/intel/oneapi/setvars.sh
+printf "/opt/intel/oneapi/2026.0/lib/\n/opt/intel/oneapi/mkl/latest/lib/\n" | sudo tee /etc/ld.so.conf.d/intel-oneapi-mkl.conf
+sudo ldconfig
+```
+
+* To register oneMKL as a selectable system provider for BLAS and LAPACK:
+```shell
+sudo update-alternatives --install /usr/lib/x86_64-linux-gnu/libblas.so libblas.so-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so 1 && \
+sudo update-alternatives --install /usr/lib/x86_64-linux-gnu/liblapack.so liblapack.so-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so 1 && \
+sudo update-alternatives --install /usr/lib/x86_64-linux-gnu/libblas.so.3 libblas.so.3-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so 1 && \
+sudo update-alternatives --install /usr/lib/x86_64-linux-gnu/liblapack.so.3 liblapack.so.3-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so 1
+```
+
+* To set oneMKL as the system provider for BLAS and LAPACK:
+```shell
+sudo update-alternatives --set libblas.so-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so && \
+sudo update-alternatives --set liblapack.so-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so && \
+sudo update-alternatives --set libblas.so.3-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so && \
+sudo update-alternatives --set liblapack.so.3-x86_64-linux-gnu /opt/intel/oneapi/mkl/latest/lib/libmkl_rt.so
 ```
 
 ##### Windows
 
-By default, on Windows, R will ship with its own unoptimized reference implementation of BLAS and LAPACK. These can be switched to oneMKL by either copying all oneMKL DLL files to R's binary folder, or by building custom DLLs - see this guide for full instructions:
-https://www.intel.com/content/www/us/en/developer/articles/technical/using-onemkl-with-r.html
+By default, on Windows, R will ship with its own unoptimized reference implementation of BLAS and LAPACK. These can be switched to oneMKL by either copying all oneMKL DLL files to R's binary folder, or by building custom DLLs - see [this guide](https://www.intel.com/content/www/us/en/developer/articles/technical/using-onemkl-with-r.html) for full instructions.
+
 
 Alternatively, for an easier way of using R with oneMKL on Windows, one might prefer to install R in a conda environment instead ([miniforge](https://github.com/conda-forge/miniforge) distribution is recommended).
 
@@ -128,7 +148,10 @@ export MKL_THREADING_LAYER=GNU
 
 **Importantly:** this environment variable needs to be set **before** R is started, otherwise it will have no effect.
 
-On Linux, this can be achieved by defining it in a file such as `/etc/profile`.
+On Linux, this can be achieved by defining it in a file such as `/etc/environment`:
+```shell
+printf "MKL_THREADING_LAYER=GNU\n" | sudo tee -a /etc/environment
+```
 
 On Windows, it can be configured as a user environment variable through the control panel.
 
@@ -297,7 +320,7 @@ When it comes to small data and short operations (e.g. reordering columns, summi
 ```r
 library(data.table)
 df <- data.frame(a=c(1,2), b=c(3,4))
-# to convert from base R to data.tbale:
+# to convert from base R to data.table:
 setDT(df)
 # can also do it by copying: dt <- as.data.table(df)
 # whereas 'setDT' modifies the object in-place
